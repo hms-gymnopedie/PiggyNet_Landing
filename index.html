@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PiggyNet 🐷 — 친구들과 맛집 지도</title>
+    <meta name="description" content="친한 친구들과 맛집을 공유하고, 돼지 캐릭터를 키우는 맛집 지도 앱. 지금 시작하세요!">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --pink: #FF6B9D;
+            --pink-light: #FFB8D0;
+            --pink-dark: #E5447A;
+            --peach: #FFECD2;
+            --orange: #FF9A56;
+            --cream: #FFF8F0;
+            --dark: #2D1B30;
+            --gray: #6B5B6E;
+            --white: #FFFFFF;
+            --gradient-hero: linear-gradient(135deg, #FF6B9D 0%, #FF9A56 50%, #FFECD2 100%);
+            --gradient-card: linear-gradient(145deg, #ffffff 0%, #fff5f9 100%);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--cream);
+            color: var(--dark);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: var(--gradient-hero);
+            position: relative;
+            padding: 2rem;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: var(--cream);
+            clip-path: ellipse(55% 100% at 50% 100%);
+        }
+
+        .hero-pig {
+            font-size: clamp(5rem, 15vw, 10rem);
+            animation: pigBounce 2s ease-in-out infinite;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15));
+            margin-bottom: 1rem;
+        }
+
+        @keyframes pigBounce {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 800;
+            color: var(--white);
+            text-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(90deg, #FFE066, #FFFFFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: clamp(1rem, 3vw, 1.4rem);
+            color: rgba(255,255,255,0.9);
+            max-width: 500px;
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2.5rem;
+            background: var(--white);
+            color: var(--pink-dark);
+            font-size: 1.15rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+
+        .hero-cta:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        }
+
+        .badge-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .badge-pill {
+            padding: 0.4rem 1rem;
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            font-size: 0.85rem;
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        /* ===== SECTION COMMON ===== */
+        section {
+            padding: 5rem 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .section-desc {
+            text-align: center;
+            color: var(--gray);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ===== FEATURE CARDS ===== */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--gradient-card);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,107,157,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--gradient-hero);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(255,107,157,0.15);
+        }
+
+        .card:hover::before { opacity: 1; }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .card p {
+            color: var(--gray);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* ===== PIG LEVELS ===== */
+        .levels-track {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #FFF0F5, #FFF8F0);
+            border-radius: 24px;
+            padding: 2.5rem 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .levels-track::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 5%;
+            right: 5%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--pink-light), var(--orange));
+            border-radius: 2px;
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+
+        .level-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 1;
+            position: relative;
+        }
+
+        .level-emoji {
+            font-size: 2.5rem;
+            background: var(--white);
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .level-emoji:hover {
+            transform: scale(1.15);
+        }
+
+        .level-name {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--dark);
+        }
+
+        .level-pts {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        /* ===== PROGRESS BAR DEMO ===== */
+        .progress-demo {
+            background: linear-gradient(135deg, #FFF0F5, #FFF8F0);
+            border-radius: 24px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .progress-demo h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-bar-wrap {
+            position: relative;
+            height: 16px;
+            background: rgba(255,107,157,0.15);
+            border-radius: 10px;
+            max-width: 500px;
+            margin: 0 auto;
+            overflow: visible;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--pink), var(--orange));
+            border-radius: 10px;
+            transition: width 2s ease;
+            position: relative;
+        }
+
+        .progress-pig {
+            position: absolute;
+            right: -18px;
+            top: -22px;
+            font-size: 2rem;
+            animation: pigWalk 0.6s ease-in-out infinite;
+        }
+
+        @keyframes pigWalk {
+            0%, 100% { transform: translateY(0) scaleX(1); }
+            50% { transform: translateY(-5px) scaleX(-1); }
+        }
+
+        .progress-label {
+            margin-top: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+
+        /* ===== HOW IT WORKS ===== */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+            counter-reset: step;
+        }
+
+        .step {
+            position: relative;
+            padding: 1.5rem;
+        }
+
+        .step-num {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-hero);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin: 0 auto 1rem;
+            box-shadow: 0 4px 15px rgba(255,107,157,0.3);
+        }
+
+        .step h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .step p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* ===== TECH STACK ===== */
+        .tech-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .tech-tag {
+            padding: 0.6rem 1.4rem;
+            background: var(--white);
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--dark);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,107,157,0.15);
+            transition: all 0.3s ease;
+        }
+
+        .tech-tag:hover {
+            border-color: var(--pink);
+            box-shadow: 0 4px 15px rgba(255,107,157,0.2);
+            transform: translateY(-2px);
+        }
+
+        /* ===== CTA ===== */
+        .cta-section {
+            text-align: center;
+            padding: 5rem 2rem;
+            background: var(--gradient-hero);
+            border-radius: 40px;
+            margin: 2rem auto;
+            max-width: 1100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '🐷🍔🍜🍰☕🐷🍕🍣🥘🐷';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            font-size: 3rem;
+            opacity: 0.08;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 1rem;
+            word-spacing: 2rem;
+            pointer-events: none;
+        }
+
+        .cta-section h2 {
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            color: var(--white);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .cta-section p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .cta-section .hero-cta {
+            position: relative;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--pink);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            .levels-track {
+                flex-wrap: wrap;
+                gap: 1rem;
+                justify-content: center;
+            }
+            .levels-track::before { display: none; }
+            .level-emoji { width: 55px; height: 55px; font-size: 1.8rem; }
+            section { padding: 3rem 1.5rem; }
+        }
+
+        /* ===== SCROLL ANIMATIONS ===== */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-pig">🐷</div>
+    <h1><span>PiggyNet</span></h1>
+    <p class="hero-sub">친한 친구들과 맛집을 공유하고,<br>돼지 캐릭터를 함께 키워보세요!</p>
+    <a href="#features" class="hero-cta">🐽 자세히 보기</a>
+    <div class="badge-row">
+        <span class="badge-pill">📍 맛집 지도</span>
+        <span class="badge-pill">🐷 돼지 키우기</span>
+        <span class="badge-pill">👫 친구와 함께</span>
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+    <h2 class="section-title fade-up">핵심 기능</h2>
+    <p class="section-desc fade-up">PiggyNet은 친구 그룹 전용 맛집 지도 앱이에요</p>
+    <div class="features">
+        <div class="card fade-up">
+            <span class="card-icon">🗺️</span>
+            <h3>간편한 맛집 등록</h3>
+            <p>가게 이름만 검색하면 위치·업종이 자동으로 채워져요. 탭 2번이면 등록 완료!</p>
+        </div>
+        <div class="card fade-up">
+            <span class="card-icon">👥</span>
+            <h3>비공개 그룹 지도</h3>
+            <p>친한 친구끼리만 공유하는 맛집 지도. 초대 코드로 간편하게 그룹을 만들어요.</p>
+        </div>
+        <div class="card fade-up">
+            <span class="card-icon">📍</span>
+            <h3>GPS 체크인</h3>
+            <p>맛집에 도착하면 체크인! 50m 이내에서 인증하고 포인트를 모아요.</p>
+        </div>
+        <div class="card fade-up">
+            <span class="card-icon">🐷</span>
+            <h3>돼지 평점</h3>
+            <p>별점 대신 돼지로 평가해요. 추천도(등록 시)와 방문 평가(체크인 후)를 따로 남겨요.</p>
+        </div>
+        <div class="card fade-up">
+            <span class="card-icon">🔗</span>
+            <h3>핀 공유 & 동기화</h3>
+            <p>나만의 맛집을 그룹에 공유하면, 수정할 때 자동으로 동기화돼요.</p>
+        </div>
+        <div class="card fade-up">
+            <span class="card-icon">🏆</span>
+            <h3>뱃지 & 리더보드</h3>
+            <p>주간 미식왕, 개척자, 스트릭 뱃지… 친구들과 건강한 경쟁을 즐겨요.</p>
+        </div>
+    </div>
+</section>
+
+<!-- PIG LEVELS -->
+<section>
+    <h2 class="section-title fade-up">🐷 돼지를 키워보세요</h2>
+    <p class="section-desc fade-up">맛집을 탐험할수록 돼지가 성장해요. 100포인트마다 레벨업!</p>
+    <div class="levels-track fade-up">
+        <div class="level-item">
+            <div class="level-emoji">🐣</div>
+            <span class="level-name">햇돼지</span>
+            <span class="level-pts">0 pt</span>
+        </div>
+        <div class="level-item">
+            <div class="level-emoji">🐷</div>
+            <span class="level-name">꼬마돼지</span>
+            <span class="level-pts">100 pt</span>
+        </div>
+        <div class="level-item">
+            <div class="level-emoji">🐖</div>
+            <span class="level-name">뚱돼지</span>
+            <span class="level-pts">200 pt</span>
+        </div>
+        <div class="level-item">
+            <div class="level-emoji">👨‍🍳</div>
+            <span class="level-name">미식돼지</span>
+            <span class="level-pts">300 pt</span>
+        </div>
+        <div class="level-item">
+            <div class="level-emoji">👑</div>
+            <span class="level-name">황금돼지</span>
+            <span class="level-pts">400 pt</span>
+        </div>
+    </div>
+
+    <!-- PROGRESS BAR DEMO -->
+    <div class="progress-demo fade-up">
+        <h3>🗺️ 탐험 현황</h3>
+        <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="progressBar">
+                <span class="progress-pig">🐷</span>
+            </div>
+        </div>
+        <p class="progress-label"><span id="progressCount">0</span>/20곳 방문!</p>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section>
+    <h2 class="section-title fade-up">이렇게 시작해요</h2>
+    <p class="section-desc fade-up">3단계로 바로 시작할 수 있어요</p>
+    <div class="steps fade-up">
+        <div class="step">
+            <div class="step-num">1</div>
+            <h4>카카오 로그인</h4>
+            <p>카카오 계정으로 3초 만에 가입</p>
+        </div>
+        <div class="step">
+            <div class="step-num">2</div>
+            <h4>그룹 만들기</h4>
+            <p>초대 코드를 친구에게 카톡으로 공유</p>
+        </div>
+        <div class="step">
+            <div class="step-num">3</div>
+            <h4>맛집 등록</h4>
+            <p>가게 검색 → 추천도 선택 → 끝!</p>
+        </div>
+    </div>
+</section>
+
+<!-- TECH STACK -->
+<section>
+    <h2 class="section-title fade-up">기술 스택</h2>
+    <p class="section-desc fade-up">검증된 모던 기술로 만들어요</p>
+    <div class="tech-grid fade-up">
+        <span class="tech-tag">⚡ Next.js</span>
+        <span class="tech-tag">🎨 Tailwind CSS</span>
+        <span class="tech-tag">🗺️ Naver Map API</span>
+        <span class="tech-tag">🔐 Supabase</span>
+        <span class="tech-tag">🗄️ PostgreSQL + PostGIS</span>
+        <span class="tech-tag">🚀 Vercel</span>
+        <span class="tech-tag">📱 PWA</span>
+    </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section fade-up">
+    <h2>친구들과 맛집 탐험,<br>지금 시작할래요? 🐷</h2>
+    <p>곧 출시됩니다. 기대해 주세요!</p>
+    <a href="#" class="hero-cta">🐽 Coming Soon</a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <p>© 2026 <a href="#">PiggyNet</a> 🐷 — 친구들과 맛집 지도</p>
+</footer>
+
+<script>
+    // Scroll animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+    // Progress bar animation
+    const progressObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const bar = document.getElementById('progressBar');
+                const count = document.getElementById('progressCount');
+                bar.style.width = '60%';
+
+                let current = 0;
+                const target = 12;
+                const interval = setInterval(() => {
+                    current++;
+                    count.textContent = current;
+                    if (current >= target) clearInterval(interval);
+                }, 100);
+
+                progressObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    const progressDemo = document.querySelector('.progress-demo');
+    if (progressDemo) progressObserver.observe(progressDemo);
+</script>
+
+</body>
+</html>
